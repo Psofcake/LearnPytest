@@ -1,0 +1,13 @@
+# apps/mycalc.py
+
+# 사칙 연산 기능 함수 작성
+def add(a,b):
+    # a와 b가 숫자인지 검사하는 조건문
+    if not isinstance(a,(int,float)) or not isinstance(b,(int,float)):
+    #isinstance(a,(int,float)) : a가 int또는float 즉 숫자인지 확인.    
+        raise TypeError("입력값은 숫자여야 합니다.")
+    
+    return a+b
+
+def sub(a,b):
+    pass
