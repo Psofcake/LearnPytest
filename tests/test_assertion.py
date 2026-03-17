@@ -4,9 +4,13 @@ import pytest
 import warnings
 from apps.mycalc import divide
 
-#--상세 보기 명령어-- p19
+#--상세 보기 명령어--
 #pytest -v
 #각 테스트 함수명과 결과 표시 : PASSED / FAILED
+
+#--원하는 테스트만 선택 실행 명령어--
+#pytest -k calc
+#테스트 함수/클래스/파일 이름에 calc라는 단어가 포함된 테스트만 실행
 
 #assert 구문을 사용하는 다양한 방법
 def test_various_assertion():
@@ -78,10 +82,3 @@ def test_deprecation_warning():
     with pytest.warns(DeprecationWarning):
         assert function_that_warns() #warnig이 잘 뜨도록 하며 assert를 붙이면 함수가 반환하는 값도 함께 검증
         #function_that_warns()
-
-
-
-
-
-
-
