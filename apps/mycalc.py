@@ -9,5 +9,7 @@ def add(a,b):
     
     return a+b
 
-def sub(a,b):
-    pass
+def subtract(a,b):
+    if not isinstance(a,(int,float)) or not isinstance(b,(int,float)):
+        raise TypeError("입력값은 숫자여야 합니다.")
+    return a-b

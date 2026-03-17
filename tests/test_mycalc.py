@@ -1,7 +1,7 @@
 # tests/test_mycalc.py
 
 #from apps import mycalc as c
-from apps.mycalc import add, sub #테스트 대상 함수 가져오기
+from apps.mycalc import add, subtract #테스트 대상 함수 가져오기
 import pytest
 
 # 양수끼리의 합을 검사하는 테스트 함수 정의
@@ -23,8 +23,10 @@ def test_add_negative_number():
     actual = add(a,b)
     assert actual == expect
 
-#Collected 1 item <-인식된 테스트 코드 개수
-#함수를 정의해두기만 해도 자동으로 검사
-#테스트를 통과한 경우 . 표기됨 (예: test_test1.py ...)
-#실패 케이스가 있으면 F 표기됨 (예: test_test1.py .F.)
+def test_substract_with_negative_number():
+    assert subtract(5,-3) == 8
+    assert subtract(-3,5) == -8
+#    assert가 여러개여도 됨. 다만 모든 assert가 통과해야 해당 테스트함수 통과로 체크됨.
 
+#def test_fail_example(): 
+#    assert add(2,2)==3 #의도적으로 fail 발생시키기
