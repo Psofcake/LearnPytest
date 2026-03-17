@@ -12,6 +12,10 @@ from apps.mycalc import divide
 #pytest -k calc
 #테스트 함수/클래스/파일 이름에 calc라는 단어가 포함된 테스트만 실행
 
+#--프린트 문 출력--
+#pytest -s
+#기본적으로 프린트를 무시하므로 이를 출력하려면 -s 추가.
+
 #assert 구문을 사용하는 다양한 방법
 def test_various_assertion():
     #참/거짓 검증 (assert, assert not)
