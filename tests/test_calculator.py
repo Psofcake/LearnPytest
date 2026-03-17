@@ -7,22 +7,23 @@
 from apps.calculator import Calculator
 import pytest
 
+@pytest.fixture #함수 정의 상단에 픽스처임을 먼저 알림
+def calc_instance(): #픽스처 함수. 이름은 알아서
+    calc = Calculator()
+    return calc
+
 def test_add():
-    calc = Calculator() #객체를 테스트 코드마다 매번 생성하기 번거로움, 코드 중복
-    assert calc.add(2,3) == 5
-    assert calc.add(-1,1) == 0
+    assert calc_instance.add(2,3) == 5
+    assert calc_instance.add(-1,1) == 0
 
 def test_subtract():
-    calc = Calculator() #코드 중복
-    assert calc.subtract(2,3) == -1
-    assert calc.subtract(-1,1) == -2
+    assert calc_instance.subtract(2,3) == -1
+    assert calc_instance.subtract(-1,1) == -2
 
 def test_divide():
-    calc = Calculator() #코드 중복
-    assert calc.divide(2,3) == pytest.approx(2/3)
-    assert calc.divide(-1,1) == -1
+    assert calc_instance.divide(2,3) == pytest.approx(2/3)
+    assert calc_instance.divide(-1,1) == -1
 
 def test_divide_by_zero():
-    calc = Calculator() #코드 중복
     with pytest.raises(ZeroDivisionError):
-        calc.divide(1,0)
+        calc_instance.divide(1,0)
