@@ -14,9 +14,19 @@
 #tests/conftest.py에 픽스처 정의 시 다른 파일에서 import 없이 해당 픽스처 사용 가능. 중앙관리 및 재사용성 증대
 import pytest
 from apps.calculator import Calculator
+from tests.data_loader import load_test_data
 
 @pytest.fixture(scope="module") #함수 정의 상단에 픽스처임을 먼저 알림
 def calc_instance(): #픽스처 함수. 이름은 알아서
     print("\n--Calculator 인스턴스 생성(conftest.py)")  #픽스처 호출을 확인하기 위한 프린트문
     calc = Calculator()
     return calc
+
+# 동적 파라미터화
+def pytest_generate_tests(metafunc): #pytest가 테스트 케이스를 생성할 때 개입해서 파라미터를 동적으로 만드는 hook 함수
+    if "ADDCASES" in metafunc.fixturenames: # metafunc - pytest가 테스트 함수 정보를 담아서 전달하는 객체
+        cases = load_test_data("add.csv")   # metafunc에 "SUBCASES"가 있으면 add.csv 로드하기.
+        metafunc.parametrize("ADDCASES",cases)
+    elif "SUBCASES" in metafunc.fixturenames:
+        cases = load_test_data("sub.csv")
+        metafunc.parametrize("SUBCASES",cases)
