@@ -30,3 +30,43 @@ def pytest_generate_tests(metafunc): #pytest가 테스트 케이스를 생성할
     elif "SUBCASES" in metafunc.fixturenames:
         cases = load_test_data("sub.csv")
         metafunc.parametrize("SUBCASES",cases)
+
+
+from selenium import webdriver
+from selenium.webdriver.edge.options import Options
+'''
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+'''
+@pytest.fixture
+def driver():
+    d = webdriver.Chrome()
+    yield d
+    d.quit()
+
+# <--headless 옵션 사용 정의하기>
+def pytest_addoption(parser):
+    parser.addoption("--headless", action="store_true", default=False)
+# 사용방법 : pytest tests/test_login.py --headless
+# (백그라운드에서 실행하여 화면을 띄우지 않고도 결과를 확인할 수 있다.)
+
+
+# 웹페이지 셀레니움 엣지 드라이버
+@pytest.fixture(scope="session") # 그냥 두면 쿠키가 남아 fail됨. 따라서 초기화 필요
+def driver(request): #request는 pytest가 제공하는 픽스처
+    headless = request.config.getoption("--headless") #--headless옵션이 있는지 확인
+    opts = Options()
+    if headless:
+        opts.add_argument("--headless=new")
+    opts.add_argument("--window-size=1280,900")
+    d = webdriver.Edge(options = opts)
+    print("######## driver 시작 #########")
+    yield d
+    d.quit()
+
+#autouse=True - 모든 테스트함수 (파라미터 각 케이스 포함) 앞에서 자동 실행
+@pytest.fixture(autouse=True)
+def reset_browser_state(driver):
+    driver.delete_all_cookies() #드라이버를 쓸때마다 쿠키/스토리지 정리
+    driver.get("about:blank")
