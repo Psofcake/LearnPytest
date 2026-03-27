@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>카카오 책 검색</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .search-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #status {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      border-radius: 5px;
+    }
+
+    .card img {
+      width: 120px;
+      height: 160px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .price {
+      color: #e91e63;
+      font-weight: bold;
+    }
+
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>카카오 책 검색</h1>
+
+<div class="search-box">
+  <input type="text" id="query" placeholder="책 제목을 입력하세요">
+  <button onclick="searchBooks(1)">검색</button>
+</div>
+
+<div id="status">상태: 대기 중</div>
+
+<div id="results" class="grid"></div>
+
+<div class="pagination">
+  <button onclick="prevPage()">이전</button>
+  <span id="pageInfo">1</span>
+  <button onclick="nextPage()">다음</button>
+</div>
+
+<script>
+  const REST_API_KEY = "3ff33f5c1cf21e81ce3f8d3c0abf8e45"; // ← 여기에 키 입력
+
+  let currentPage = 1;
+  let currentQuery = "";
+  let isEnd = false;
+
+  const statusEl = document.getElementById("status");
+  const resultsEl = document.getElementById("results");
+  const pageInfo = document.getElementById("pageInfo");
+
+  // 엔터 검색
+  document.getElementById("query").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      searchBooks(1);
+    }
+  });
+
+  function formatPrice(price) {
+    return price.toLocaleString("ko-KR") + "원";
+  }
+
+  async function searchBooks(page) {
+    const query = document.getElementById("query").value.trim();
+    if (!query) return;
+
+    currentQuery = query;
+    currentPage = page;
+
+    const startTime = performance.now();
+    statusEl.textContent = "⏳ 로딩 중...";
+
+    try {
+      const res = await fetch(
+        `https://dapi.kakao.com/v3/search/book?query=${encodeURIComponent(query)}&size=10&page=${page}`,
+        {
+          headers: {
+            Authorization: `KakaoAK ${REST_API_KEY}`
+          }
+        }
+      );
+
+      const endTime = performance.now();
+      const duration = Math.round(endTime - startTime);
+
+      if (!res.ok) {
+        statusEl.textContent = `요청 실패 (${res.status})`;
+        return;
+      }
+
+      const data = await res.json();
+
+      isEnd = data.meta.is_end;
+
+      statusEl.textContent = `성공 (${res.status}) / ${duration}ms`;
+
+      renderResults(data.documents);
+      pageInfo.textContent = currentPage;
+
+    } catch (err) {
+      statusEl.textContent = "요청 실패";
+      console.error(err);
+    }
+  }
+
+  function renderResults(books) {
+    resultsEl.innerHTML = "";
+
+    books.forEach(book => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <img src="${book.thumbnail || 'https://via.placeholder.com/120x160'}">
+        <div class="title">${book.title}</div>
+        <div class="price">${formatPrice(book.price)}</div>
+      `;
+
+      resultsEl.appendChild(card);
+    });
+  }
+
+  function nextPage() {
+    if (isEnd) return;
+    searchBooks(currentPage + 1);
+  }
+
+  function prevPage() {
+    if (currentPage > 1) {
+      searchBooks(currentPage - 1);
+    }
+  }
+</script>
+
+</body>
+</html>
